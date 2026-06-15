@@ -102,7 +102,14 @@ Send these commands directly to the authenticated Telegram bot to query or contr
 
 ### 5. Diagnostics and Troubleshooting
 
-#### 5.1 Check Stack Logs
+#### 5.1 Run Automated AI Diagnostics
+To verify that your OpenRouter API keys and Telegram bot tokens are valid and working before a real camera motion event occurs, run the diagnostic test script:
+```bash
+./test_ai.sh
+```
+This utility builds the testing environment inside the container, generates a mock camera snapshot frame, submits it to OpenRouter for classification, and delivers the notification image to your Telegram channel.
+
+#### 5.2 Check Stack Logs
 Check execution traces for the custom alert service or NVR daemon:
 ```bash
 cd /opt/frigate

@@ -184,6 +184,13 @@ The stack features an interactive configuration form to quickly generate the req
 ```
 This script runs in the terminal, prompting you for camera IPs, stream credentials, and API integration keys, validating the inputs before saving them.
 
+### Diagnostic Verification for AI and Telegram
+To verify that your OpenRouter API keys and Telegram credentials are valid and can communicate successfully before waiting for a real camera motion event, run the automated diagnostic script:
+```bash
+./test_ai.sh
+```
+This tool compiles the verification logic inside the Docker container, generates a mock camera snapshot frame, sends it to OpenRouter for classification, and delivers the categorized test photo to your Telegram channel.
+
 3. **Configure Settings**:
    Add network IPs, keys, and tokens to your generated `/opt/frigate/.env` file:
    ```env

@@ -32,12 +32,14 @@ The release package contains the following source files and directories:
 | `install_frigate_raspberry_pi.sh` | Bash | Deprecated Raspberry Pi-specific installer |
 | `configure.sh` | Bash | Interactive configuration setup form |
 | `convert_pc_to_server.sh` | Bash | OS hardening and headless PC-to-server converter |
+| `test_ai.sh` | Bash | AI alert integration diagnostic launcher |
 | `repository-metadata.json` | JSON | Package descriptor and index keywords |
 | `caddy/Caddyfile` | Config | Caddy proxy configuration rules |
 | `config/config.yml` | YAML | Frigate cameras and model configurations |
 | `config/rtsp_nginx_append.conf` | Config | Nginx RTSP parameters |
 | `mosquitto/mosquitto.conf` | Config | Mosquitto broker setup |
 | `scripts/setup_esp32_ap.sh` | Bash | AP routing and network segregator |
+| `scripts/test_ai_integration.py` | Python | AI vision and Telegram diagnostic tool |
 | `security-ai-alerts/Dockerfile` | Docker | Docker building description for alert service |
 | `security-ai-alerts/requirements.txt` | Python | List of Python dependencies |
 | `security-ai-alerts/app.py` | Python | Source code for the alert daemon |
