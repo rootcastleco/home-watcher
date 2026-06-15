@@ -28,7 +28,10 @@ The release package contains the following source files and directories:
 |:---|:---:|:---|
 | `docker-compose.yml` | YAML | Core service stack definitions |
 | `.env.example` | Template | Template configuration parameters |
-| `install_frigate_raspberry_pi.sh` | Bash | Stack provisioner and cert generator |
+| `install.sh` | Bash | Generic Linux server installer script |
+| `install_frigate_raspberry_pi.sh` | Bash | Deprecated Raspberry Pi-specific installer |
+| `configure.sh` | Bash | Interactive configuration setup form |
+| `convert_pc_to_server.sh` | Bash | OS hardening and headless PC-to-server converter |
 | `repository-metadata.json` | JSON | Package descriptor and index keywords |
 | `caddy/Caddyfile` | Config | Caddy proxy configuration rules |
 | `config/config.yml` | YAML | Frigate cameras and model configurations |

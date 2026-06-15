@@ -41,7 +41,7 @@ git clone --depth 1 https://github.com/rootcastleco/home-watcher.git "${INSTALL_
 # Pass variables and execute installer
 log "Running main stack installation scripts..."
 cd "${INSTALL_TEMP}"
-bash install_frigate_raspberry_pi.sh "$@"
+bash install.sh "$@"
 
 # Clean up installer cache
 rm -rf "${INSTALL_TEMP}"

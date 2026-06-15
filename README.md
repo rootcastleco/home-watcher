@@ -167,8 +167,22 @@ Alternatively, you can manually clone the repository and execute the installer s
 ```bash
 git clone https://github.com/rootcastleco/home-watcher.git
 cd home-watcher
-sudo bash install_frigate_raspberry_pi.sh
+sudo bash install.sh
 ```
+
+### Headless PC/Laptop Server Conversion (Optional)
+If you are deploying on a generic PC or Laptop running Ubuntu/Debian (instead of a pre-hardened server OS), you can convert and harden the machine into a dedicated headless surveillance server before installation:
+```bash
+sudo bash convert_pc_to_server.sh
+```
+This utility disables desktop GUI resource consumption, blocks system suspends (e.g. laptop lid closes), restricts incoming traffic via UFW firewall, and automatically provisions Docker and Git dependencies.
+
+### Interactive Configuration Wizard
+The stack features an interactive configuration form to quickly generate the required `.env` file without manual editing:
+```bash
+./configure.sh
+```
+This script runs in the terminal, prompting you for camera IPs, stream credentials, and API integration keys, validating the inputs before saving them.
 
 3. **Configure Settings**:
    Add network IPs, keys, and tokens to your generated `/opt/frigate/.env` file:

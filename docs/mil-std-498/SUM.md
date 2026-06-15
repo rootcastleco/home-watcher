@@ -36,20 +36,27 @@ git clone https://github.com/rootcastleco/home-watcher.git
 cd home-watcher
 ```
 
-#### 3.2 Step 2: Run the Automated Stack Installer
-Run the installation script with root permissions to install Docker, setup directories, and configure certificates:
+#### 3.2 Step 2: Convert Generic PC to Dedicated Server (Optional)
+If deploying on a standard desktop PC or laptop (running Debian/Ubuntu), run this command to disable GUI desktop, disable suspends/lid switches, enable UFW firewall, and install Docker:
 ```bash
-# Standard installation
-sudo bash install_frigate_raspberry_pi.sh
-
-# Optional: Installation with isolated ESP32 access point configuration
-sudo SETUP_ESP32_AP=true ESP_AP_PASSWORD='your-secure-ap-password' bash install_frigate_raspberry_pi.sh
+sudo bash convert_pc_to_server.sh
 ```
 
-#### 3.3 Step 3: Configure Local Environments
-Open `/opt/frigate/.env` using a terminal text editor and fill in your network and integration parameters:
+#### 3.3 Step 3: Run the Automated Stack Installer
+Execute the generic installer script to setup package dependencies, synchronize stack files, and generate SSL certificates:
 ```bash
-sudo nano /opt/frigate/.env
+# Standard installation
+sudo bash install.sh
+
+# Optional: Installation with isolated wireless AP subnet config
+sudo SETUP_ESP32_AP=true ESP_AP_PASSWORD='your-secure-ap-password' bash install.sh
+```
+This script will automatically trigger the interactive configuration form (`configure.sh`) if a `.env` file does not exist, enabling terminal form entry for all credentials.
+
+#### 3.4 Step 4: Configure Settings via Setup Form (Optional)
+If you need to manually re-run the interactive setup wizard to adjust configurations:
+```bash
+./configure.sh
 ```
 Key fields to modify:
 - **`FRIGATE_DVR_IP`**: Local IP of the DVR system (e.g., `10.0.10.10`).
