@@ -60,16 +60,41 @@ The Home Watcher appliance employs a dual-interface network model to enforce zer
   │                                 └──────────────┘                                       │
   │                                                                                        │
   │   ┌────────────────────────────────────────────────────────────────────────────────┐   │
-  │   │ Local Wi-Fi Access Point (SSID: frigate-esp-local, Subnet 192.168.50.0/24)     │   │
-  │   │ (Isolated network: no WAN forwarding to ensure video feed privacy)             │   │
+  │   │ Local Isolated Wi-Fi AP (SSID: frigate-esp-local, Subnet 192.168.50.0/24)      │   │
+  │   │ (Blocks WAN forwarding for wireless modules to preserve feed security)          │   │
   │   │                                                                                │   │
-  │   │   ┌─────────────┐                                                              │   │
-  │   │   │  ESP32-CAM  │ (RTSP Stream) ──────────────────────────────────┐            │   │
-  │   │   └─────────────┘                                                 │            │   │
-  │   └───────────────────────────────────────────────────────────────────┼────────────┘   │
-  │                                                                       │                │
-  │                                                                       ▼                │
-  │                                                           (DVR / Camera RTSP Feeds)    │
+  │   │   ┌──────────────┐                                                             │   │
+  │   │   │  ESP32-CAM   ├─(RTSP/MJPEG)──┐                                             │   │
+  │   │   └──────────────┘               │                                             │   │
+  │   │   ┌──────────────┐               │                                             │   │
+  │   │   │ ESP32-S3-EYE ├─(RTSP/MJPEG)──┼─┐                                           │   │
+  │   │   └──────────────┘               │ │                                           │   │
+  │   │   ┌──────────────┐               │ │                                           │   │
+  │   │   │ M5Stack Cam  ├─(RTSP/MJPEG)──┼─┼─┐                                         │   │
+  │   │   └──────────────┘               │ │ │                                         │   │
+  │   └──────────────────────────────────┼─┼─┼─────────────────────────────────────────┘   │
+  │                                      ▼ ▼ ▼                                             │
+  │                              (Wireless AP Streams)                                     │
+  │                                      │                                                 │
+  │                                      ▼                                                 │
+  │   ┌────────────────────────────────────────────────────────────────────────────────┐   │
+  │   │ Local Administrative Network / LAN Subnet                                      │   │
+  │   │                                                                                │   │
+  │   │   ┌──────────────┐                                                             │   │
+  │   │   │ ONVIF Camera ├─(RTSP/ONVIF PTZ Command)──────────┐                         │   │
+  │   │   └──────────────┘                                   │                         │   │
+  │   │   ┌──────────────┐                                   │                         │   │
+  │   │   │ XMeye DVR    ├─(H.264/H.265 RTSP streams)────────┼─┐                       │   │
+  │   │   └──────────────┘                                   │ │                       │   │
+  │   │   ┌──────────────┐                                   │ │                       │   │
+  │   │   │ RTSP IP Cam  ├─(Hikvision/Dahua/Reolink RTSP)────┼─┼─┐                     │   │
+  │   │   └──────────────┘                                   │ │ │                     │   │
+  │   │   ┌──────────────┐                                   │ │ │                     │   │
+  │   │   │ HTTP Webcams ├─(MJPEG / HTTP stream profiles)────┼─┼─┼─┐                   │   │
+  │   │   └──────────────┘                                   │ │ │ │                   │   │
+  │   └──────────────────────────────────────────────────────┼─┼─┼─┼───────────────────┘   │
+  │                                                          ▼ ▼ ▼ ▼                       │
+  │                                                   (Physical Network Feeds)             │
   └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -94,6 +119,25 @@ Administrators can steer physical PTZ cameras dynamically:
 - Activating a direction publishes command payloads to the MQTT control topic `frigate/<camera>/ptz`.
 - To prevent infinite pan drift, the daemon automatically publishes a STOP command exactly 0.5 seconds after start.
 - A fresh snapshot is then fetched and refreshed inline within the bot message interface.
+
+---
+
+## Supported Hardware and Camera Models
+
+The Rootcastle Home Watcher stack utilizes `go2rtc` and `ffmpeg` inside the Frigate core, enabling native compatibility with a wide range of IP-based camera hardware and wireless microcontroller modules:
+
+### 1. Isolated Wireless Microcontroller Cameras (ESP Subnet)
+These devices connect directly to the isolated `frigate-esp-local` Wi-Fi Access Point to keep video traffic localized:
+- **ESP32-CAM**: Low-cost camera modules executing standard RTSP firmware or MJPEG web servers (resolving streams via local AP IP mapping, e.g. `http://192.168.50.X:80/stream`).
+- **ESP32-S3-EYE**: High-performance camera module supporting higher framerates and resolutions, running RTSP or MJPEG configurations.
+- **M5Stack Camera Modules (Unit Cam, M5Camera)**: ESP32-based modular camera systems running custom video streaming firmware.
+
+### 2. Local Network Security Cameras (LAN Subnet)
+These standard security cameras communicate over the local administrative LAN:
+- **ONVIF Compliant Cameras**: Cameras supporting ONVIF specifications (such as PTZ cameras) for dynamic directional navigation, zoom, and preset controls.
+- **XMeye / DVR Systems**: Multi-channel DVR/NVR appliances streaming H.264 or H.265 feeds via RTSP.
+- **RTSP IP Cameras**: Generic IP security cameras (such as Hikvision, Dahua, Reolink, Amcrest, and TP-Link Tapo) streaming main or sub-streams natively.
+- **HTTP / MJPEG Webcams**: Local HTTP-based network cams, USB webcams (reverse-proxied via local MJPEG streamers), or 3D printer cameras (such as FLSun/Creality webcam streams).
 
 ---
 

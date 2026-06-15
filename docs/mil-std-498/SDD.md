@@ -54,13 +54,21 @@ The system comprises four major containerized items managed by Docker Compose:
       └──────────────┬───────────────┘
                      │ (RTSP / HTTP MJPEG)
                      ▼
-  [Isolated cameras on wlan0] / [DVR on eth0]
+              [ Frigate Core ]
+                     │
+         ┌───────────┴───────────┐
+         ▼                       ▼
+  [Isolated AP Subnet]   [LAN Subnet]
+   - ESP32-CAM            - ONVIF PTZ
+   - ESP32-S3-EYE         - XMeye DVR
+   - M5Stack Cam          - RTSP IP Cams
+                          - HTTP Cams
 ```
 
 #### 3.2 Network Subsystem Topology
 The host system establishes two network zones:
-- **Zone 1: Local WAN (`eth0`)**: Connects the appliance to the administrative LAN and WAN gateway. Facilitates outbound API requests to Telegram and OpenRouter.
-- **Zone 2: Isolated AP (`wlan0`)**: Broadcasts the private `frigate-esp-local` wireless network. Routing tables drop all forwarding traffic from `wlan0` to `eth0`.
+- **Zone 1: Local WAN (`eth0`)**: Connects the appliance to the administrative LAN and WAN gateway. Facilitates outbound API requests to Telegram and OpenRouter, as well as ingesting local LAN camera streams (ONVIF PTZ, XMeye DVR channels, generic RTSP cameras, HTTP streams).
+- **Zone 2: Isolated AP (`wlan0`)**: Broadcasts the private `frigate-esp-local` wireless network. Routing tables drop all forwarding traffic from `wlan0` to `eth0` to isolate wireless modules (ESP32-CAM, ESP32-S3-EYE, M5Stack Unit Cam).
 
 ---
 
