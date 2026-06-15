@@ -21,7 +21,7 @@
 
 ## About Rootcastle
 
-Developed by Batuhan Ayrıbaş (Lead Security Architect at Rootcastle), the Rootcastle Home Watcher converts low-overhead single board computers (such as the Raspberry Pi 5) into fully hardened local NVR appliances. Combining containerized security routing, offline local camera access points, and remote AI-augmented alerts, the stack guarantees video data isolation and high-fidelity threat notifications.
+Developed by Batuhan Ayrıbaş , the Rootcastle Home Watcher converts low-overhead single board computers (such as the Raspberry Pi 5) into fully hardened local NVR appliances. Combining containerized security routing, offline local camera access points, and remote AI-augmented alerts, the stack guarantees video data isolation and high-fidelity threat notifications.
 
 For more security stacks, customer integration services, and operational support, visit:  
 [www.rootcastle.com](https://www.rootcastle.com)
