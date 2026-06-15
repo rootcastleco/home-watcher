@@ -1,0 +1,232 @@
+# ==============================================================================
+# MIL-STD-498 SYSTEM CONFIGURATION FILE
+# ==============================================================================
+# SYSTEM:             Rootcastle Home Watcher Stack
+# SUBSYSTEM:          NVR Detection Subsystem
+# FILE NAME:          config.yml
+# VERSION:            1.2.0
+# DATE:               2026-06-15
+# SECURITY CLASSIF:   UNCLASSIFIED
+# DESCRIPTION:        Surveillance rules, object detection tracking thresholds,
+#                     and go2rtc video stream configurations. Parameterized
+#                     via environment variables for public deployment.
+# ==============================================================================
+
+mqtt:
+  enabled: true
+  host: 127.0.0.1
+  port: 1883
+  topic_prefix: frigate
+
+auth:
+  enabled: true
+
+detectors:
+  cpu1:
+    type: cpu
+    num_threads: 2
+
+# Only record motion events, not continuous (saves CPU and disk)
+record:
+  enabled: true
+  continuous:
+    days: 0
+  motion:
+    days: 3
+  alerts:
+    retain:
+      days: 5
+      mode: all
+  detections:
+    retain:
+      days: 5
+      mode: all
+
+snapshots:
+  enabled: true
+  bounding_box: true
+  retain:
+    default: 5
+
+# Object tracking: person, cat, bird, dog with bounding boxes
+objects:
+  track:
+    - person
+    - cat
+    - bird
+  filters:
+    person:
+      min_score: 0.5
+      threshold: 0.7
+    cat:
+      min_score: 0.4
+      threshold: 0.6
+    bird:
+      min_score: 0.4
+      threshold: 0.6
+
+go2rtc:
+  streams:
+    # ESP32 office camera (MJPEG)
+    esp32_ofis:
+      - http://{FRIGATE_ESP32_USER}:{FRIGATE_ESP32_PASSWORD}@{FRIGATE_ESP32_IP}:2324/stream
+
+    # FLSun T1 3D Printer webcam (MJPEG)
+    yazici_cam:
+      - http://{FRIGATE_PRINTER_IP}/webcam/?action=stream
+
+    # XMeye DVR channels via RTSP (Main and Sub streams)
+    ofis:
+      - rtsp://{FRIGATE_DVR_USER}:{FRIGATE_DVR_PASSWORD}@{FRIGATE_DVR_IP}:554/user={FRIGATE_DVR_USER}&password={FRIGATE_DVR_PASSWORD}&channel=3&stream=0.sdp#video
+    ofis_sub:
+      - rtsp://{FRIGATE_DVR_USER}:{FRIGATE_DVR_PASSWORD}@{FRIGATE_DVR_IP}:554/user={FRIGATE_DVR_USER}&password={FRIGATE_DVR_PASSWORD}&channel=3&stream=1.sdp#video
+
+    giris_1:
+      - rtsp://{FRIGATE_DVR_USER}:{FRIGATE_DVR_PASSWORD}@{FRIGATE_DVR_IP}:554/user={FRIGATE_DVR_USER}&password={FRIGATE_DVR_PASSWORD}&channel=2&stream=0.sdp#video
+    giris_1_sub:
+      - rtsp://{FRIGATE_DVR_USER}:{FRIGATE_DVR_PASSWORD}@{FRIGATE_DVR_IP}:554/user={FRIGATE_DVR_USER}&password={FRIGATE_DVR_PASSWORD}&channel=2&stream=1.sdp#video
+
+    giris_2:
+      - rtsp://{FRIGATE_DVR_USER}:{FRIGATE_DVR_PASSWORD}@{FRIGATE_DVR_IP}:554/user={FRIGATE_DVR_USER}&password={FRIGATE_DVR_PASSWORD}&channel=1&stream=0.sdp#video
+    giris_2_sub:
+      - rtsp://{FRIGATE_DVR_USER}:{FRIGATE_DVR_PASSWORD}@{FRIGATE_DVR_IP}:554/user={FRIGATE_DVR_USER}&password={FRIGATE_DVR_PASSWORD}&channel=1&stream=1.sdp#video
+
+    # Outdoor PTZ IP camera (Main and Sub streams)
+    ptz_dis:
+      - rtsp://{FRIGATE_PTZ_USER}:{FRIGATE_PTZ_PASSWORD}@{FRIGATE_PTZ_IP}:554/live/0/MAIN
+    ptz_dis_sub:
+      - rtsp://{FRIGATE_PTZ_USER}:{FRIGATE_PTZ_PASSWORD}@{FRIGATE_PTZ_IP}:554/live/0/SUB#video
+
+ffmpeg:
+  input_args: preset-rtsp-restream
+  retry_interval: 10
+  output_args:
+    record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c:v copy -an
+
+cameras:
+  esp32_ofis:
+    enabled: true
+    ffmpeg:
+      inputs:
+        - path: http://127.0.0.1:1984/api/stream.mjpeg?src=esp32_ofis
+          input_args: preset-http-mjpeg-generic
+          roles:
+            - detect
+            - record
+    detect:
+      enabled: true
+      width: 160
+      height: 120
+      fps: 5
+
+
+
+  ofis:
+    enabled: true
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/ofis
+          input_args: preset-rtsp-restream
+          roles:
+            - record
+        - path: rtsp://127.0.0.1:8554/ofis_sub
+          input_args: preset-rtsp-restream
+          roles:
+            - detect
+    detect:
+      enabled: true
+      width: 352
+      height: 288
+      fps: 5
+
+  giris_1:
+    enabled: true
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/giris_1
+          input_args: preset-rtsp-restream
+          roles:
+            - record
+        - path: rtsp://127.0.0.1:8554/giris_1_sub
+          input_args: preset-rtsp-restream
+          roles:
+            - detect
+    detect:
+      enabled: true
+      width: 352
+      height: 288
+      fps: 5
+
+  giris_2:
+    enabled: true
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/giris_2
+          input_args: preset-rtsp-restream
+          roles:
+            - record
+        - path: rtsp://127.0.0.1:8554/giris_2_sub
+          input_args: preset-rtsp-restream
+          roles:
+            - detect
+    detect:
+      enabled: true
+      width: 352
+      height: 288
+      fps: 5
+
+  ptz_dis:
+    enabled: true
+    onvif:
+      host: '{FRIGATE_PTZ_IP}'
+      port: 80
+      user: '{FRIGATE_PTZ_USER}'
+      password: '{FRIGATE_PTZ_PASSWORD}'
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/ptz_dis
+          input_args: preset-rtsp-restream
+          roles:
+            - record
+        - path: rtsp://127.0.0.1:8554/ptz_dis_sub
+          input_args: preset-rtsp-restream
+          roles:
+            - detect
+    detect:
+      enabled: true
+      width: 704
+      height: 576
+      fps: 5
+
+  yazici_cam:
+    enabled: true
+    ffmpeg:
+      inputs:
+        - path: http://127.0.0.1:1984/api/stream.mjpeg?src=yazici_cam
+          input_args: preset-http-mjpeg-generic
+          roles:
+            - detect
+    detect:
+      enabled: true
+      width: 1280
+      height: 720
+      fps: 5
+    record:
+      enabled: false
+    snapshots:
+      enabled: false
+    objects:
+      track: []
+
+version: 0.17-0
+
+# CPU-heavy features DISABLED for Raspberry Pi
+semantic_search:
+  enabled: false
+face_recognition:
+  enabled: false
+lpr:
+  enabled: false
+classification:
+  bird:
+    enabled: false

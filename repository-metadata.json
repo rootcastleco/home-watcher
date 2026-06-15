@@ -1,0 +1,33 @@
+{
+  "name": "rootcastle-home-watcher",
+  "description": "Hardened, local-first intelligent NVR video surveillance and AI alert security appliance stack for Raspberry Pi 5.",
+  "version": "1.2.0",
+  "license": "MIT",
+  "homepage": "https://www.rootcastle.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rootcastleco/home-watcher.git"
+  },
+  "keywords": [
+    "rootcastle",
+    "home-watcher",
+    "surveillance",
+    "nvr",
+    "frigate",
+    "ai-alerts",
+    "openrouter",
+    "telegram-bot",
+    "security",
+    "zero-trust",
+    "raspberry-pi",
+    "caddy-proxy",
+    "mil-std-498"
+  ],
+  "author": {
+    "name": "Batuhan Ayrıbaş",
+    "url": "https://github.com/rootcastleco"
+  },
+  "bugs": {
+    "url": "https://github.com/rootcastleco/home-watcher/issues"
+  }
+}

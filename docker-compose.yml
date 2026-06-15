@@ -1,0 +1,78 @@
+# ==============================================================================
+# MIL-STD-498 SYSTEM ARCHITECTURE ORCHESTRATION FILE
+# ==============================================================================
+# SYSTEM:             Rootcastle Home Watcher Stack
+# FILE NAME:          docker-compose.yml
+# VERSION:            1.2.0
+# DATE:               2026-06-15
+# SECURITY CLASSIF:   UNCLASSIFIED
+# DESCRIPTION:        Multi-container configuration defining Caddy, Mosquitto,
+#                     Frigate NVR, and custom AI alert worker services.
+# ==============================================================================
+version: "3.9"
+
+services:
+  mqtt:
+    container_name: frigate-mqtt
+    image: eclipse-mosquitto:2
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto-data:/mosquitto/data
+
+  frigate:
+    container_name: frigate
+    image: ghcr.io/blakeblackshear/frigate:stable
+    restart: unless-stopped
+    stop_grace_period: 30s
+    privileged: true
+    network_mode: host
+    shm_size: "${FRIGATE_SHM_SIZE:-256mb}"
+    env_file:
+      - ./.env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./config:/config
+      - ./media:/media/frigate
+      - type: tmpfs
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
+
+  security-ai-alerts:
+    container_name: security-ai-alerts
+    build:
+      context: ./security-ai-alerts
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    environment:
+      FRIGATE_API_URL: "http://127.0.0.1:5000"
+    network_mode: host
+    volumes:
+      - security-ai-state:/app/state
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8089/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  frigate-proxy:
+    container_name: frigate-proxy
+    image: caddy:2-alpine
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy/certs:/etc/caddy/certs:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  caddy-config:
+  caddy-data:
+  mosquitto-data:
+  security-ai-state:
