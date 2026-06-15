@@ -1,1 +1,1 @@
-# home-watcher
+# MIL-STD-498 standart cam system
