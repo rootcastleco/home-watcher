@@ -1,1 +1,1 @@
-# MIL-STD-498 standart cam system
+# MIL-STD-498 standard cam system
