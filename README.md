@@ -106,21 +106,25 @@ Administrators can steer physical PTZ cameras dynamically:
 - An OpenRouter API key.
 
 ### Installation
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/rootcastleco/home-watcher.git
-   cd home-watcher
-   ```
 
-2. **Run the Automated Installer**:
-   Execute the provisioner to establish base dependencies, directories, and generate self-signed proxy keys:
-   ```bash
-   # Standard installation
-   sudo bash install_frigate_raspberry_pi.sh
+#### Option 1: One-Command Automated Installation (Recommended)
+You can automatically provision dependencies, SSL configurations, directories, and launch the stack using a single command:
 
-   # Isolated AP configuration
-   sudo SETUP_ESP32_AP=true ESP_AP_PASSWORD='your-secure-ap-password' bash install_frigate_raspberry_pi.sh
-   ```
+```bash
+# Standard installation
+curl -fsSL https://raw.githubusercontent.com/rootcastleco/home-watcher/main/easy_install.sh | sudo bash
+
+# Installation with isolated ESP32 access point configuration
+curl -fsSL https://raw.githubusercontent.com/rootcastleco/home-watcher/main/easy_install.sh | sudo SETUP_ESP32_AP=true ESP_AP_PASSWORD='your-secure-ap-password' bash
+```
+
+#### Option 2: Manual Installation
+Alternatively, you can manually clone the repository and execute the installer script:
+```bash
+git clone https://github.com/rootcastleco/home-watcher.git
+cd home-watcher
+sudo bash install_frigate_raspberry_pi.sh
+```
 
 3. **Configure Settings**:
    Add network IPs, keys, and tokens to your generated `/opt/frigate/.env` file:
